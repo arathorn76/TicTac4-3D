@@ -1,0 +1,7 @@
+class playerAI{
+  
+}
+
+class playerHuman{
+  
+}
