@@ -3,6 +3,7 @@ class Board {
     this.size = size;
     this.cellsize = cellsize;
     this.activePlayer = 1;
+    this.winner = false;
     this.maxMoves = size * size * size;
 
     this.cells = [];
@@ -18,7 +19,7 @@ class Board {
             (i - size / 2) * this.cellsize,
             (j - size / 2) * this.cellsize,
             (k - size / 2) * this.cellsize,
-            this.cellsize,
+            this.cellsize
           );
         }
       }
@@ -33,6 +34,19 @@ class Board {
         }
       }
     }
+  }
+
+  clicked2d(mx, my) {
+    for (var i = 0; i < this.size; i++) {
+      for (var j = 0; j < this.size; j++) {
+        for (var k = 0; k < this.size; k++) {
+          if (this.cells[i][j][k].clicked(mx, my)) {
+           return createVector(i,j,k);
+          }
+        }
+      }
+    }
+    return false;
   }
 
   show3d() {
@@ -56,6 +70,7 @@ class Board {
       if (this.checkWinningMove(x, y, z)) {
         //GAME OVER
         this.maxMoves = 0;
+        this.winner = this.activePlayer;
       } else {
         this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
         this.maxMoves--;
@@ -67,7 +82,7 @@ class Board {
   }
 
   movePossible() {
-    return (this.maxMoves > 0);
+    return this.maxMoves > 0;
   }
 
   checkWinningMove(x, y, z) {
