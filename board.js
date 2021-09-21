@@ -169,13 +169,14 @@ class Board {
     }
   }
 
-  paintWinner(x, y, z, vec) {
-    for (var i = 0; i < 7; i++) {
-      vec[i].add(x, y, z);
-      if (this.validCell(vec[i].x, vec[i].y, vec[i].z)) {
-        this.cells[vec[i].x][vec[i].y][vec[i].z].state += 2;
+  paintWinner(x, y, z, vectorarray) {
+    for(let vec of vectorarray){ 
+      vec.add(x,y,z);
+      console.log(vec,x,y,z);
+      if(this.validCell(vec.x, vec.y, vec.z)){
+        this.cells[vec.x][vec.y][vec.z].state += 2;
       }
-    }
+    } 
   }
 }
 
