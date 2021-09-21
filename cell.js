@@ -8,7 +8,9 @@ class Cell {
     this.state = 0;
 
     this.scale2d = 0.9;
-    this.size2d = floor(min(width / 16, height / 16));
+    
+    let factor = this.gridsize * this.gridsize;
+    this.size2d = floor(min(width / factor, height / factor));
   }
 
   play(player) {
@@ -31,10 +33,11 @@ class Cell {
 
   // functions specific to 2D-mode
   show2d() {
-    let x = this.xpos2d();
-    let y = (this.y + 4 * this.z - 8) * this.size2d;
+    let x = this.pos2d(this.x);
+    let y = this.pos2d(this.y);
 
     if (this.state === 1) {
+      // player 1
       noFill();
       rect(
         x + (this.size2d / 4) * this.scale2d,
@@ -43,6 +46,7 @@ class Cell {
       );
       fill(255, 100, 100, 100);
     } else if (this.state === 2) {
+      // player 2
       noFill();
       ellipseMode(CENTER);
       ellipse(
@@ -52,51 +56,34 @@ class Cell {
       );
       fill(100, 255, 100, 100);
     } else if (this.state === 3) {
+      // winning field of player 1
       fill(255, 0, 0);
     } else if (this.state === 4) {
+      // winning field of player 2
       fill(0, 255, 0);
     } else {
       fill(255, 255, 255);
     }
 
     rect(x, y, this.size2d * this.scale2d);
-
-    if (debug) {
-      // mark cell 0,0,0
-      if (this.x === 0 && this.y === 0 && this.z === 0) {
-        fill(0, 0, 255);
-        ellipseMode(CENTER);
-        ellipse(
-          x + (this.size2d / 2) * this.scale2d,
-          y + (this.size2d / 2) * this.scale2d,
-          (this.size2d / 2) * this.scale2d
-        );
-      }
-    }
   }
 
   clicked(mx, my) {
-    //let size2d = min(width / 16, height / 16);
-    let x = this.xpos2d();
-    let y = (this.y + 4 * this.z - 8) * this.size2d;
+    let x = this.pos2d(this.x);
+    let y = this.pos2d(this.y);
 
     if (mx >= x && mx <= x + this.size2d * this.scale2d) {
       if (my >= y && my <= y + this.size2d * this.scale2d) {
         return true;
-        box(x, y, (x + this.size2d) * this.scale2d);
       }
     }
     return false;
   }
 
-  xpos2d() {
-    let x = (this.x + this.gridsize * this.z - this.gridsize * 2) * this.size2d;
-    return x;
-  }
-
-  ypos2d() {
-    let y = (this.y + this.gridsize * this.z - this.gridsize * 2) * this.size2d;
-    return y;
+  pos2d(dimension) {
+    let pos =
+      (dimension + this.gridsize * this.z - this.gridsize * 2) * this.size2d;
+    return pos;
   }
 
   // functions specific to 3D-mode
@@ -111,20 +98,29 @@ class Cell {
     translate(x, y, z);
     if (this.state === 1) {
       fill(255, 100, 100, 100);
+      noStroke();
       sphere(this.size / 2);
+      stroke(0);
     } else if (this.state === 2) {
       fill(100, 255, 100, 100);
       box(this.size / 2);
+    } else if (this.state === 3) {
+      fill(255, 100, 100);
+      noStroke();
+      sphere(this.size / 2);
+      stroke(0);
+    } else if (this.state === 4) {
+      fill(100, 255, 100);
+      box(this.size / 2);
     } else {
+    }
       noFill();
       box(this.size);
-    }
     pop();
   }
 
-  pos3d(dimension){
-    let pos = (dimension - this.gridsize * .5) * this.size;
+  pos3d(dimension) {
+    let pos = (dimension - this.gridsize * 0.5) * this.size;
     return pos;
   }
-
 }
