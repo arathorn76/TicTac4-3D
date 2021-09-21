@@ -7,7 +7,6 @@ class Board {
     this.cellsize = cellsize;
     this.activePlayer = 1;
     this.winner = false;
-    this.maxMoves = size * size * size;
     this.possibleMoves = [];
 
     this.cells = [];
@@ -75,13 +74,11 @@ class Board {
       if (check4win) {
         if (this.checkWinningMove(x, y, z)) {
           //GAME OVER
-          this.maxMoves = 0;
           this.winner = this.activePlayer;
           return true;
         }
       }
       this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
-      this.maxMoves--;
       return true;
     } else {
       return false;
@@ -94,13 +91,12 @@ class Board {
     }
     if (this.cells[x][y][z].undo(this.activePlayer)) {
       this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
-      this.maxMoves++;
       this.possibleMoves.push(createVector(x, y, z));
     }
   }
 
   movePossible() {
-    return this.maxMoves > 0;
+    return this.possibleMoves.length > 0;
   }
 
   checkWinningMove(x, y, z, paint = true) {
