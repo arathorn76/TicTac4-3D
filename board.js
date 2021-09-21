@@ -60,7 +60,9 @@ class Board {
       return false;
     }
     let testVec = createVector(x, y, z);
-    let index = this.possibleMoves.findIndex((element) => element.equals(testVec));
+    let index = this.possibleMoves.findIndex((element) =>
+      element.equals(testVec)
+    );
 
     var validMove = this.cells[x][y][z].play(this.activePlayer);
 
@@ -100,7 +102,7 @@ class Board {
 
     // cell has 13 neighboring lines
     // -> array of 13 lines
-    // each neighboring line must be checked <this.size> positions 
+    // each neighboring line must be checked <this.size> positions
     // in positiv and negativ direction
     // -> array of 13 lines * [( 2 * this.size ) - 1] points
     var neighborVectors = createNeighborVectors(this.size);
@@ -146,19 +148,24 @@ class Board {
   }
 
   checkNeighbor(x, y, z, vec) {
+    //returns 0 if cell or neighbor cell is invalid or cell is empty
+    //returns 1 if checked cell is owned by activePlayer
+    //returns negative if cell is owned by opponent
+    //(negative enough to pull any line with opposing forces negative)
     if (!this.validCell(x + vec.x, y + vec.y, z + vec.z)) {
-      return -1;
+      return 0;
     }
     if (!this.validCell(x, y, z)) {
-      return -1;
+      return 0;
     }
-    if (
-      this.cells[x][y][z].state !=
-      this.cells[x + vec.x][y + vec.y][z + vec.z].state
-    ) {
-      return -1;
-    } else {
-      return 1;
+
+    switch (this.cells[x + vec.x][y + vec.y][z + vec.z].state) {
+      case this.activePlayer:
+        return 1;
+      case 0:
+        return 0;
+      default:
+        return -2 * this.size;
     }
   }
 
@@ -195,7 +202,7 @@ function createNeighborVectors(size) {
   //  for(let dir of directions){
   for (var i = 0; i < directions.length; i++) {
     vectorField[i] = [];
-    for (var j = 0; j < ( 2 * size ) - 1; j++) {
+    for (var j = 0; j < 2 * size - 1; j++) {
       //create individual vectors
       vectorField[i][j] = createVector(
         directions[i][0] * (j + 1 - size),
