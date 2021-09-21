@@ -3,12 +3,12 @@ class Cell {
     this.x = x;
     this.y = y;
     this.z = z;
-    this.size = size;
+    this.size3d = size;
     this.gridsize = gridsize;
     this.state = 0;
 
     this.scale2d = 0.9;
-    
+
     let factor = this.gridsize * this.gridsize;
     this.size2d = floor(min(width / factor, height / factor));
   }
@@ -35,37 +35,41 @@ class Cell {
   show2d() {
     let x = this.pos2d(this.x);
     let y = this.pos2d(this.y);
+    let offset = floor((this.size2d / 2) * this.scale2d);
 
-    if (this.state === 1) {
-      // player 1
-      noFill();
-      rect(
-        x + (this.size2d / 4) * this.scale2d,
-        y + (this.size2d / 4) * this.scale2d,
-        (this.size2d / 2) * this.scale2d
-      );
-      fill(255, 100, 100, 100);
-    } else if (this.state === 2) {
-      // player 2
-      noFill();
-      ellipseMode(CENTER);
-      ellipse(
-        x + (this.size2d / 2) * this.scale2d,
-        y + (this.size2d / 2) * this.scale2d,
-        (this.size2d / 2) * this.scale2d
-      );
-      fill(100, 255, 100, 100);
-    } else if (this.state === 3) {
-      // winning field of player 1
-      fill(255, 0, 0);
-    } else if (this.state === 4) {
-      // winning field of player 2
-      fill(0, 255, 0);
-    } else {
-      fill(255, 255, 255);
+    switch (this.state) {
+      case 1:
+        // player 1
+        noFill();
+        rectMode(CENTER);
+        rect(x + offset, y + offset, offset);
+        fill(255, 100, 100, 100);
+        break;
+
+      case 2:
+        // player 2
+        noFill();
+        ellipseMode(CENTER);
+        ellipse(x + offset, y + offset, offset);
+        fill(100, 255, 100, 100);
+        break;
+
+      case 3:
+        // winning field of player 1
+        fill(255, 0, 0);
+        break;
+
+      case 4:
+        // winning field of player 2
+        fill(0, 255, 0);
+        break;
+
+      default:
+        fill(255, 255, 255);
     }
 
-    rect(x, y, this.size2d * this.scale2d);
+    rectMode(CORNER);
+    rect(x, y, offset * 2);
   }
 
   clicked(mx, my) {
@@ -82,7 +86,7 @@ class Cell {
 
   pos2d(dimension) {
     let pos =
-      (dimension + this.gridsize * this.z - this.gridsize * 2) * this.size2d;
+      (dimension + this.gridsize * ( this.z - 2)) * this.size2d;
     return pos;
   }
 
@@ -99,28 +103,28 @@ class Cell {
     if (this.state === 1) {
       fill(255, 100, 100, 100);
       noStroke();
-      sphere(this.size / 2);
+      sphere(this.size3d / 2);
       stroke(0);
     } else if (this.state === 2) {
       fill(100, 255, 100, 100);
-      box(this.size / 2);
+      box(this.size3d / 2);
     } else if (this.state === 3) {
       fill(255, 100, 100);
       noStroke();
-      sphere(this.size / 2);
+      sphere(this.size3d / 2);
       stroke(0);
     } else if (this.state === 4) {
       fill(100, 255, 100);
-      box(this.size / 2);
+      box(this.size3d / 2);
     } else {
     }
-      noFill();
-      box(this.size);
+    noFill();
+    box(this.size3d);
     pop();
   }
 
   pos3d(dimension) {
-    let pos = (dimension - this.gridsize * 0.5) * this.size;
+    let pos = (dimension - this.gridsize * 0.5) * this.size3d;
     return pos;
   }
 }
