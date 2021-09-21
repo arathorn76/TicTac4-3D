@@ -1,3 +1,6 @@
+let testVec;
+const vectIdent = (element) => element.equals(testVec);
+
 class Board {
   constructor(size, cellsize) {
     this.size = size;
@@ -5,22 +8,19 @@ class Board {
     this.activePlayer = 1;
     this.winner = false;
     this.maxMoves = size * size * size;
+    this.possibleMoves = [];
 
     this.cells = [];
 
-    for (var k = 0; k < this.size; k++) {
-      this.cells[k] = [];
+    for (var i = 0; i < this.size; i++) {
+      this.cells[i] = [];
 
-      for (var i = 0; i < this.size; i++) {
-        this.cells[k][i] = [];
+      for (var j = 0; j < this.size; j++) {
+        this.cells[i][j] = [];
 
-        for (var j = 0; j < this.size; j++) {
-          this.cells[k][i][j] = new Cell(
-            (i - size / 2) * this.cellsize,
-            (j - size / 2) * this.cellsize,
-            (k - size / 2) * this.cellsize,
-            this.cellsize
-          );
+        for (var k = 0; k < this.size; k++) {
+          this.cells[i][j][k] = new Cell(i, j, k, this.cellsize, this.size);
+          this.possibleMoves.push(createVector(i, j, k));
         }
       }
     }
@@ -41,7 +41,7 @@ class Board {
       for (var j = 0; j < this.size; j++) {
         for (var k = 0; k < this.size; k++) {
           if (this.cells[i][j][k].clicked(mx, my)) {
-           return createVector(i,j,k);
+            return createVector(i, j, k);
           }
         }
       }
@@ -59,25 +59,43 @@ class Board {
     }
   }
 
-  play(x, y, z) {
+  play(x, y, z, check4win = true) {
     if (!this.validCell(x, y, z)) {
       return false;
     }
-
+    testVec = createVector(x, y, z);
+    let index = this.possibleMoves.findIndex(vectIdent);
+    if (debug) {
+      console.log(testVec, index, this.possibleMoves.length);
+    }
     var validMove = this.cells[x][y][z].play(this.activePlayer);
 
     if (validMove) {
-      if (this.checkWinningMove(x, y, z)) {
-        //GAME OVER
-        this.maxMoves = 0;
-        this.winner = this.activePlayer;
-      } else {
-        this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
-        this.maxMoves--;
+      this.possibleMoves.splice(index, 1);
+      if (check4win) {
+        if (this.checkWinningMove(x, y, z)) {
+          //GAME OVER
+          this.maxMoves = 0;
+          this.winner = this.activePlayer;
+          return true;
+        }
       }
+      this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
+      this.maxMoves--;
       return true;
     } else {
       return false;
+    }
+  }
+
+  undo(x, y, z) {
+    if (!this.validCell(x, y, z)) {
+      return false;
+    }
+    if (this.cells[x][y][z].undo(this.activePlayer)) {
+      this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
+      this.maxMoves++;
+      this.possibleMoves.push(createVector(x, y, z));
     }
   }
 
@@ -85,7 +103,7 @@ class Board {
     return this.maxMoves > 0;
   }
 
-  checkWinningMove(x, y, z) {
+  checkWinningMove(x, y, z, paint = true) {
     // some checking
     var count = 0;
     var left = true;
@@ -100,7 +118,7 @@ class Board {
     var receive = 0;
     var vec = [];
 
-    for (var j = 0; j < 13; j++) {
+    for (var j = 0; j < neighborVectors.length; j++) {
       count = 0;
       vec = neighborVectors[j];
 
@@ -134,9 +152,9 @@ class Board {
 
       // if the count reaches 3 the move was winning
       if (count >= 3) {
-        console.log("WINNER: ", this.activePlayer);
-        this.paintWinner(x, y, z, vec);
-        this.maxMoves = 0;
+        if (paint) {
+          this.paintWinner(x, y, z, vec);
+        }
         return true;
       }
     }
