@@ -6,7 +6,13 @@ class playerAI {
      */
     this.type = type_;
     this.id = id_;
-    this.evals = { WIN: Infinity, row2: 3, row3: 10, multirow3: 10 };
+    this.evals = {
+      WIN: Infinity,
+      row2: 3,
+      row3: 10,
+      multirow3: 10,
+      noGood: -1,
+    };
   }
 
   makeMove() {
@@ -110,17 +116,57 @@ class playerAI {
   }
 
   minimaxEvaluateBoardState() {
-    let value = 0;
-    for (let i = 0; i < board.size; i++) {
-      for (let j = 0; j < board.size; j++) {
-        for (let k = 0; k < board.size; k++) {
-          let cell = board.cells[i][j][k];
-          if (cell.state === 0) {
-            // evaluate further
-          }
-        }
-      }
+    //Evaluation prinziple:
+    //starting points are only available cells
+    //(value lies in the fact that this line can be completed)
+
+    let boardValue = 0;
+    for (let cell of board.possibleMoves) {
+      let cellValue = 0;
+      let neighborVectors = createNeighborVectors(board.size);
+      for (let vector of neighborVectors) {
+        let lineValue = 0;
+        let lineFlags = 0;
+        for (let neighbor of vector) {
+          let receive = board.checkNeighbor(cell.x, cell.y, cell.z, neighbor);
+          lineFlags += receive;
+        } //end neighbor of line
+        switch (lineFlags) {
+          case 1:
+            break;
+          case 2:
+            lineValue += this.evals.row2;
+            break;
+          case 3:
+            lineValue += this.evals.row3;
+            break;
+          case -2:
+            lineValue += this.evals.noGood;
+            break;
+          case -3:
+            lineValue += this.evals.noGood;
+            break;
+          case -4:
+            lineValue += this.evals.noGood;
+            break;
+          case -7:
+            lineValue += this.evals.noGood;
+            break;
+          case -8:
+            lineValue -= this.evals.row2;
+            break;
+          case -12:
+            lineValue -= this.evals.row3;
+            break;
+          default:
+        } //end switch
+        cellValue += lineValue;
+      } //vector of neighborVectors
+
+      //acumulate cellValues to build boardValue;
+      boardValue += cellValue;
     }
-    return value;
+
+    return boardValue;
   }
 }
