@@ -165,7 +165,7 @@ class Board {
       case 0:
         return 0;
       default:
-        return -2 * this.size;
+        return -4; //TODO considering minimax evaluation if this.size!=4
     }
   }
 
