@@ -30,7 +30,7 @@ function setup() {
   createGameControls();
 
   startGame();
-  
+
   frameRate(5);
 }
 
@@ -41,25 +41,21 @@ function draw() {
   } else {
     board.show3d();
   }
-
+  
   fill(255, 0, 0);
   if (board.winner) {
     text("WINNER: " + board.activePlayer, 0, -height / 3);
-    view.remove();
-    noLoop();
-  } else {
-    text("next Player: " + board.activePlayer, 0, -height / 3);
-  }
-  
-  if (!board.movePossible) {
-    console.log("TIE!");
     noLoop();
     return;
   } else {
-    //if (board.activePlayer === 1) {
-      // player 1 = randomAI
+    if (!board.movePossible) {
+    text("TIE!", 0, -height / 3);
+      noLoop();
+      return;
+    } else {
       players[board.activePlayer - 1].makeMove();
-    //}
+      text("next Player: " + board.activePlayer, 0, -height / 3);
+    }
   }
 
 }
@@ -78,9 +74,9 @@ function mousePressed() {
   ) {
     // player 2 = human
     let move = false;
-    let x = mouseX - width / 2;
-    let y = mouseY - height / 2;
-    move = board.clicked2d(x, y);
+    let mx = mouseX - width / 2;
+    let my = mouseY - height / 2;
+    move = board.clicked2d(mx, my);
     if (move) {
       board.play(move.x, move.y, move.z);
     }
@@ -88,7 +84,7 @@ function mousePressed() {
 }
 
 function createViewControls() {
-  if(view) view.remove();
+  if (view) view.remove();
   view = createDiv("view controls<br />");
   div2d3d = createDiv("Ansicht 2D/3D");
   div2d3d.parent(view);
@@ -114,13 +110,13 @@ function createGameControls() {
   buttonRestart.parent(control);
   buttonRestart.mouseClicked(startGame);
   player1 = createSelect();
+  player1.position(5, height - 30);
   player1.option(`HUMAN`);
-  player1.position(5,height - 30);
   player1.option(`RANDOM`);
   player1.option(`AI1`);
   player1.selected(`RANDOM`);
   player2 = createSelect();
-  player2.position(150,height - 30);
+  player2.position(150, height - 30);
   player2.option(`HUMAN`);
   player2.option(`RANDOM`);
   player2.option(`AI1`);
