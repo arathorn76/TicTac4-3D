@@ -147,7 +147,7 @@ class Board {
     return valid;
   }
 
-  checkNeighbor(x, y, z, vec) {
+  checkNeighbor(x, y, z, vec, player = this.activPlayer) {
     //returns 0 if cell or neighbor cell is invalid or cell is empty
     //returns 1 if checked cell is owned by activePlayer
     //returns negative if cell is owned by opponent
@@ -160,25 +160,25 @@ class Board {
     }
 
     switch (this.cells[x + vec.x][y + vec.y][z + vec.z].state) {
-      case this.activePlayer:
+      case player:
         return 1;
       case 0:
         return 0;
       default:
-        return -4; //TODO considering minimax evaluation if this.size!=4
+        return -4;
     }
   }
 
   paintWinner(x, y, z, vectorarray) {
-    for(let vec of vectorarray){ 
-      vec.add(x,y,z);
-      console.log(vec,x,y,z);
-      if(this.validCell(vec.x, vec.y, vec.z)){
+    for (let vec of vectorarray) {
+      vec.add(x, y, z);
+      console.log(vec, x, y, z);
+      if (this.validCell(vec.x, vec.y, vec.z)) {
         this.cells[vec.x][vec.y][vec.z].state += 2;
       }
-    } 
+    }
   }
-}
+} //end of class board
 
 function createNeighborVectors(size) {
   //create an array of 13*7 vectors
