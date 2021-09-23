@@ -1,6 +1,6 @@
 var board;
 
-let debug = true;
+let debug = false;
 
 let view;
 let div2d3d;
@@ -35,29 +35,26 @@ function setup() {
 }
 
 function draw() {
-  background(80);
-  if (slider3DView.value() === 0) {
-    board.show2d();
-  } else {
-    board.show3d();
-  }
-  
+  show();
+
   fill(255, 0, 0);
   if (board.winner) {
     text("WINNER: " + board.activePlayer, 0, -height / 3);
+    // show()
     noLoop();
     return;
   } else {
-    if (!board.movePossible) {
-    text("TIE!", 0, -height / 3);
+    if (board.movePossible()) {
+      text("Player: " + board.activePlayer, 0, -height / 3);
+      // show()
+      players[board.activePlayer - 1].makeMove();
+    } else {
+      text("TIE!", 0, -height / 3);
+      // show()
       noLoop();
       return;
-    } else {
-      players[board.activePlayer - 1].makeMove();
-      text("next Player: " + board.activePlayer, 0, -height / 3);
     }
   }
-
 }
 
 function mousePressed() {
@@ -79,6 +76,8 @@ function mousePressed() {
     move = board.clicked2d(mx, my);
     if (move) {
       board.play(move.x, move.y, move.z);
+      show();
+      text("Player: " + board.activePlayer, 0, -height / 3);
     }
   }
 }
@@ -128,5 +127,15 @@ function startGame() {
   board = new Board(4, 40);
   players[0] = new playerAI(player1.value(), 1);
   players[1] = new playerAI(player2.value(), 2);
+  show();
   loop();
+}
+
+function show() {
+  background(80);
+  if (slider3DView.value() === 0) {
+    board.show2d();
+  } else {
+    board.show3d();
+  }
 }
