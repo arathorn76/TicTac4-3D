@@ -86,7 +86,7 @@ class Cell {
 
   pos2d(dimension) {
     let pos =
-      (dimension + this.gridsize * ( this.z - 2)) * this.size2d;
+      (dimension + this.gridsize * ( this.z - this.gridsize / 2)) * this.size2d;
     return pos;
   }
 
