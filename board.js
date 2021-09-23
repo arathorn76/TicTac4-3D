@@ -115,7 +115,7 @@ class Board {
       count = 0;
       //check all points in line
       for (let vector of vec) {
-        receive = this.checkNeighbor(x, y, z, vector);
+        receive = this.checkNeighbor(x, y, z, vector, this.activePlayer);
         if (receive > 0) {
           count += receive;
         }
