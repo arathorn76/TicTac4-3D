@@ -3,6 +3,7 @@ class playerAI {
     /* possible types:
         HUMAN  - doesn´t do a thing, is just a placeholder
         RANDOM - choses a random available cell
+        AI1 - Minimax approach using alpha-beta and maximum depth constriction
      */
     this.type = type_;
     this.id = id_;
@@ -39,12 +40,14 @@ class playerAI {
   makeMoveMinimax1(userMax) {
     let bestScore = -Infinity;
     let bestMove;
-    let maxDepth = 2;
+    let maxDepth = 3;
+    let alpha = -Infinity;
+    let beta = Infinity;
     let lastMove;
 
     for (let move of board.possibleMoves) {
       let score = -Infinity;
-      score = this.minimax(board, move, maxDepth, true, userMax);
+      score = this.minimax(board, move, maxDepth, true, userMax, alpha, beta);
       if (debug) {
         print(move, score);
       }
@@ -60,7 +63,8 @@ class playerAI {
     board.play(bestMove.x, bestMove.y, bestMove.z);
   }
 
-  minimax(board, move, depth, isMaximizer, userMax) {
+  minimax(board, move, depth, isMaximizer, userMax, alpha, beta) {
+    // print(alpha,beta);
     // update and check depth
     let actualDepth = depth;
     actualDepth--;
@@ -83,29 +87,42 @@ class playerAI {
     }
 
     // pick a move for the other player
-    let bestScore = -Infinity;
+    let bestScore = alpha;
     let bestMove;
     let lastMove;
 
     if (isMaximizer) {
       for (let move of board.possibleMoves) {
         let score = -Infinity;
-        // if (board.cells[move.x][move.y][move.z].state === 0) {
-          score = this.minimax(board, move, actualDepth, !isMaximizer, userMax);
-          //   print(move, score);
-          bestScore = max(bestScore, score);
-          lastMove = move.copy();
-        // }
+        score = this.minimax(
+          board,
+          move,
+          actualDepth,
+          !isMaximizer,
+          userMax,
+          bestScore,
+          beta
+        );
+        bestScore = max(bestScore, score);
+        lastMove = move.copy();
+        if(bestScore >= beta){break;}
       }
     } else {
+      bestScore = beta;
       for (let move of board.possibleMoves) {
         let score = Infinity;
-        // if (board.cells[move.x][move.y][move.z].state === 0) {
-          score = this.minimax(board, move, actualDepth, isMaximizer, userMax);
-          //   print(move, score);
-          bestScore = min(bestScore, score);
-          lastMove = move.copy();
-        // }
+        score = this.minimax(
+          board,
+          move,
+          actualDepth,
+          isMaximizer,
+          userMax,
+          alpha,
+          bestScore
+        );
+        bestScore = min(bestScore, score);
+        lastMove = move.copy();
+        if(bestScore <= alpha){break;}
       }
     }
     // if (!isMaximizer) {
