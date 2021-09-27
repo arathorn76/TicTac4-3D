@@ -141,7 +141,7 @@ class playerAI {
     let boardValue = 0;
     for (let cell of board.possibleMoves) {
       let cellValue = 0;
-      let neighborVectors = createNeighborVectors(board.size);
+      let neighborVectors = board.neighborVectors;
       for (let vector of neighborVectors) {
         let lineValue = 0;
         let lineFlags = 0;
