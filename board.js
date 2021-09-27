@@ -20,6 +20,7 @@ class Board {
         }
       }
     }
+    this.neighborVectors = createNeighborVectors(4);
   }
 
   show2d() {
@@ -105,13 +106,13 @@ class Board {
     // each neighboring line must be checked <this.size> positions
     // in positiv and negativ direction
     // -> array of 13 lines * [( 2 * this.size ) - 1] points
-    var neighborVectors = createNeighborVectors(this.size);
+    // var neighborVectors = createNeighborVectors(this.size);
 
     var receive = 0;
     var vec = [];
 
     //check all lines
-    for (vec of neighborVectors) {
+    for (vec of this.neighborVectors) {
       count = 0;
       //check all points in line
       for (let vector of vec) {
@@ -180,8 +181,15 @@ class Board {
   }
 } //end of class board
 
+
+class NeighborVectors{
+  constructor(size){
+  }
+  
+
+}
 function createNeighborVectors(size) {
-  //create an array of 13*7 vectors
+      //create an array of 13*7 vectors
   let directions = [
     [1, 0, 0],
     [0, 1, 0],
