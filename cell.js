@@ -11,6 +11,39 @@ class Cell {
 
     let factor = this.gridsize * this.gridsize;
     this.size2d = floor(min(width / factor, height / factor));
+
+    this.neighbors = [];
+  }
+
+  setNeighbors(neighborVectors) {
+    for (let h = 0; h < neighborVectors.length; h++) {
+      let line = neighborVectors[h];
+      this.neighbors[h] = [];
+      for (let nei of line) {
+        if (this.validCell(this.x + nei.x, this.y + nei.y, this.z + nei.z)) {
+          this.neighbors[h].push(nei);
+        }
+      }
+    }
+    //lines < 4 cells can be removed
+    for (let h = this.neighbors.length - 1; h >= 0 ; h--) {
+      if(this.neighbors[h].length < this.gridsize){
+        this.neighbors.splice(h,1);
+      }
+    }
+  }
+  validCell(x, y, z) {
+    var valid = true;
+    if (x < 0 || x >= this.gridsize) {
+      valid = false;
+    }
+    if (y < 0 || y >= this.gridsize) {
+      valid = false;
+    }
+    if (z < 0 || z >= this.gridsize) {
+      valid = false;
+    }
+    return valid;
   }
 
   play(player) {
@@ -86,7 +119,7 @@ class Cell {
 
   pos2d(dimension) {
     let pos =
-      (dimension + this.gridsize * ( this.z - this.gridsize / 2)) * this.size2d;
+      (dimension + this.gridsize * (this.z - this.gridsize / 2)) * this.size2d;
     return pos;
   }
 
