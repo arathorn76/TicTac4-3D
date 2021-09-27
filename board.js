@@ -3,6 +3,7 @@ class Board {
     this.size = size;
     this.cellsize = cellsize;
     this.activePlayer = 1;
+    this.otherPlayer = 2;
     this.winner = false;
     this.possibleMoves = [];
 
@@ -77,6 +78,7 @@ class Board {
           return true;
         }
       }
+      this.otherPlayer = this.activePlayer;
       this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
       return true;
     } else {
@@ -89,6 +91,7 @@ class Board {
       return false;
     }
     if (this.cells[x][y][z].undo(this.activePlayer)) {
+      this.otherPlayer = this.activePlayer;
       this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
       this.possibleMoves.push(createVector(x, y, z));
     }
@@ -158,9 +161,9 @@ class Board {
     if (!this.validCell(x + vec.x, y + vec.y, z + vec.z)) {
       return 0;
     }
-    if (!this.validCell(x, y, z)) {
-      return 0;
-    }
+    // if (!this.validCell(x, y, z)) {
+    //   return 0;
+    // }
 
     switch (this.cells[x + vec.x][y + vec.y][z + vec.z].state) {
       case player:
