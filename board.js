@@ -59,9 +59,6 @@ class Board {
   }
 
   play(x, y, z, check4win = true) {
-    if (!this.validCell(x, y, z)) {
-      return false;
-    }
     let testVec = createVector(x, y, z);
     let index = this.possibleMoves.findIndex((element) =>
       element.equals(testVec)
@@ -87,9 +84,6 @@ class Board {
   }
 
   undo(x, y, z) {
-    if (!this.validCell(x, y, z)) {
-      return false;
-    }
     if (this.cells[x][y][z].undo(this.activePlayer)) {
       this.otherPlayer = this.activePlayer;
       this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
@@ -116,7 +110,6 @@ class Board {
     var vec = [];
 
     //check all lines
-    // for (vec of this.neighborVectors) {
     for (vec of this.cells[x][y][z].neighbors) {
       count = 0;
       //check all points in line
@@ -139,31 +132,12 @@ class Board {
     // -> do nothing
   }
 
-  validCell(x, y, z) {
-    var valid = true;
-    if (x < 0 || x >= this.size) {
-      valid = false;
-    }
-    if (y < 0 || y >= this.size) {
-      valid = false;
-    }
-    if (z < 0 || z >= this.size) {
-      valid = false;
-    }
-    return valid;
-  }
 
   checkNeighbor(x, y, z, vec, player = this.activPlayer) {
     //returns 0 if cell or neighbor cell is invalid or cell is empty
     //returns 1 if checked cell is owned by activePlayer
     //returns negative if cell is owned by opponent
     //(negative enough to pull any line with opposing forces negative)
-    if (!this.validCell(x + vec.x, y + vec.y, z + vec.z)) {
-      return 0;
-    }
-    // if (!this.validCell(x, y, z)) {
-    //   return 0;
-    // }
 
     switch (this.cells[x + vec.x][y + vec.y][z + vec.z].state) {
       case player:
