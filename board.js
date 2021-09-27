@@ -176,20 +176,12 @@ class Board {
     for (let vec of vectorarray) {
       vec.add(x, y, z);
       console.log(vec, x, y, z);
-      if (this.validCell(vec.x, vec.y, vec.z)) {
         this.cells[vec.x][vec.y][vec.z].state += 2;
-      }
     }
   }
 } //end of class board
 
 
-class NeighborVectors{
-  constructor(size){
-  }
-  
-
-}
 function createNeighborVectors(size) {
       //create an array of 13*7 vectors
   let directions = [
