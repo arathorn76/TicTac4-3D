@@ -81,7 +81,6 @@ class playerAI {
 
     // check if this move is winning, return if so
     if (board.checkWinningMove(move.x, move.y, move.z, false)) {
-      //  if (board.winner) {
       board.undo(move.x, move.y, move.z);
       return this.evals["WIN"];
     }
@@ -115,7 +114,7 @@ class playerAI {
           board,
           move,
           actualDepth,
-          isMaximizer,
+          !isMaximizer,
           userMax,
           alpha,
           bestScore
