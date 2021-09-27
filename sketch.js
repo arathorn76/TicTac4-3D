@@ -1,5 +1,7 @@
 var board;
 
+let baseTime;
+
 let debug = false;
 
 let view;
@@ -31,10 +33,11 @@ function setup() {
 
   startGame();
 
-  frameRate(5);
+  frameRate(30);
 }
 
 function draw() {
+  baseTime = millis();
   show();
 
   fill(255, 0, 0);
@@ -55,6 +58,7 @@ function draw() {
       return;
     }
   }
+  console.log( `frame duration = ${ round( ( millis() - baseTime ) / 1000 , 3)} seconds` );
 }
 
 function mousePressed() {
