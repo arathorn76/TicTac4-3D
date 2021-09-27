@@ -25,7 +25,7 @@ class playerAI {
         this.makeMoveRandom();
         break;
       case "AI1":
-        this.makeMoveMinimax1(this.activePlayer);
+        this.makeMoveMinimax1();
         break;
       default:
         console.log(`What am I?`);
@@ -37,17 +37,24 @@ class playerAI {
     board.play(move.x, move.y, move.z);
   }
 
-  makeMoveMinimax1(userMax) {
+  makeMoveMinimax1() {
     let bestScore = -Infinity;
     let bestMove;
-    let maxDepth = 3;
+    let maxDepth = 2;
     let alpha = -Infinity;
     let beta = Infinity;
     let lastMove;
+    
+    let playerEval;
+    if(maxDepth % 2 === 0){
+      playerEval = board.activePlayer;
+    } else{
+      playerEval = board.otherPlayer;
+    }
 
     for (let move of board.possibleMoves) {
       let score = -Infinity;
-      score = this.minimax(board, move, maxDepth, true, userMax, alpha, beta);
+      score = this.minimax(board, move, maxDepth, true, playerEval, alpha, beta);
       if (debug) {
         print(move, score);
       }
@@ -63,15 +70,15 @@ class playerAI {
     board.play(bestMove.x, bestMove.y, bestMove.z);
   }
 
-  minimax(board, move, depth, isMaximizer, userMax, alpha, beta) {
+  minimax(board, move, depth, isMaximizer, playerEval, alpha, beta) {
     // print(alpha,beta);
     // update and check depth
     let actualDepth = depth;
     actualDepth--;
     if (actualDepth < 0) {
-      //   print("depth exceeded");
+      
       // evaluate the board, return actual evaluation value
-      return this.minimaxEvaluateBoardState();
+      return this.minimaxEvaluateBoardState(playerEval);
       //return -1000;
     }
 
@@ -81,7 +88,6 @@ class playerAI {
 
     // check if this move is winning, return if so
     if (board.checkWinningMove(move.x, move.y, move.z, false)) {
-      //  if (board.winner) {
       board.undo(move.x, move.y, move.z);
       return this.evals["WIN"];
     }
@@ -91,21 +97,25 @@ class playerAI {
     let bestMove;
     let lastMove;
 
+        
     if (isMaximizer) {
       for (let move of board.possibleMoves) {
         let score = -Infinity;
+        
         score = this.minimax(
           board,
           move,
           actualDepth,
           !isMaximizer,
-          userMax,
+          playerEval,
           bestScore,
           beta
         );
         bestScore = max(bestScore, score);
         lastMove = move.copy();
-        if(bestScore >= beta){break;}
+        if (bestScore >= beta) {
+          break;
+        }
       }
     } else {
       bestScore = beta;
@@ -115,14 +125,16 @@ class playerAI {
           board,
           move,
           actualDepth,
-          isMaximizer,
-          userMax,
+          !isMaximizer,
+          playerEval,
           alpha,
           bestScore
         );
         bestScore = min(bestScore, score);
         lastMove = move.copy();
-        if(bestScore <= alpha){break;}
+        if (bestScore <= alpha) {
+          break;
+        }
       }
     }
     // if (!isMaximizer) {
@@ -133,25 +145,28 @@ class playerAI {
     return bestScore;
   }
 
-  minimaxEvaluateBoardState(userMax) {
+  minimaxEvaluateBoardState(playerEval) {
     //Evaluation prinziple:
     //starting points are only available cells
     //(value lies in the fact that this line can be completed)
-
     let boardValue = 0;
     for (let cell of board.possibleMoves) {
       let cellValue = 0;
-      let neighborVectors = createNeighborVectors(board.size);
+
+      //check all lines with this cell
+      let neighborVectors = board.cells[cell.x][cell.y][cell.z].neighbors;
       for (let vector of neighborVectors) {
         let lineValue = 0;
         let lineFlags = 0;
+        
+        
         for (let neighbor of vector) {
           let receive = board.checkNeighbor(
             cell.x,
             cell.y,
             cell.z,
             neighbor,
-            userMax
+            playerEval 
           );
           lineFlags += receive;
         } //end neighbor of line

@@ -3,9 +3,11 @@ class Board {
     this.size = size;
     this.cellsize = cellsize;
     this.activePlayer = 1;
+    this.otherPlayer = 2;
     this.winner = false;
     this.possibleMoves = [];
 
+    this.neighborVectors = createNeighborVectors(4);
     this.cells = [];
 
     for (var i = 0; i < this.size; i++) {
@@ -16,6 +18,7 @@ class Board {
 
         for (var k = 0; k < this.size; k++) {
           this.cells[i][j][k] = new Cell(i, j, k, this.cellsize, this.size);
+          this.cells[i][j][k].setNeighbors(this.neighborVectors);
           this.possibleMoves.push(createVector(i, j, k));
         }
       }
@@ -75,6 +78,7 @@ class Board {
           return true;
         }
       }
+      this.otherPlayer = this.activePlayer;
       this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
       return true;
     } else {
@@ -87,6 +91,7 @@ class Board {
       return false;
     }
     if (this.cells[x][y][z].undo(this.activePlayer)) {
+      this.otherPlayer = this.activePlayer;
       this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
       this.possibleMoves.push(createVector(x, y, z));
     }
@@ -105,13 +110,14 @@ class Board {
     // each neighboring line must be checked <this.size> positions
     // in positiv and negativ direction
     // -> array of 13 lines * [( 2 * this.size ) - 1] points
-    var neighborVectors = createNeighborVectors(this.size);
+    // var neighborVectors = createNeighborVectors(this.size);
 
     var receive = 0;
     var vec = [];
 
     //check all lines
-    for (vec of neighborVectors) {
+    // for (vec of this.neighborVectors) {
+    for (vec of this.cells[x][y][z].neighbors) {
       count = 0;
       //check all points in line
       for (let vector of vec) {
@@ -155,9 +161,9 @@ class Board {
     if (!this.validCell(x + vec.x, y + vec.y, z + vec.z)) {
       return 0;
     }
-    if (!this.validCell(x, y, z)) {
-      return 0;
-    }
+    // if (!this.validCell(x, y, z)) {
+    //   return 0;
+    // }
 
     switch (this.cells[x + vec.x][y + vec.y][z + vec.z].state) {
       case player:
@@ -173,15 +179,14 @@ class Board {
     for (let vec of vectorarray) {
       vec.add(x, y, z);
       console.log(vec, x, y, z);
-      if (this.validCell(vec.x, vec.y, vec.z)) {
         this.cells[vec.x][vec.y][vec.z].state += 2;
-      }
     }
   }
 } //end of class board
 
+
 function createNeighborVectors(size) {
-  //create an array of 13*7 vectors
+      //create an array of 13*7 vectors
   let directions = [
     [1, 0, 0],
     [0, 1, 0],
