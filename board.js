@@ -6,6 +6,7 @@ class Board {
     this.winner = false;
     this.possibleMoves = [];
 
+    this.neighborVectors = createNeighborVectors(4);
     this.cells = [];
 
     for (var i = 0; i < this.size; i++) {
@@ -16,11 +17,11 @@ class Board {
 
         for (var k = 0; k < this.size; k++) {
           this.cells[i][j][k] = new Cell(i, j, k, this.cellsize, this.size);
+          this.cells[i][j][k].setNeighbors(this.neighborVectors);
           this.possibleMoves.push(createVector(i, j, k));
         }
       }
     }
-    this.neighborVectors = createNeighborVectors(4);
   }
 
   show2d() {
