@@ -40,7 +40,7 @@ class playerAI {
   makeMoveMinimax1() {
     let bestScore = -Infinity;
     let bestMove;
-    let maxDepth = 2;
+    let maxDepth = 3;
     let alpha = -Infinity;
     let beta = Infinity;
     let lastMove;
@@ -79,7 +79,6 @@ class playerAI {
       
       // evaluate the board, return actual evaluation value
       return this.minimaxEvaluateBoardState(playerEval);
-      //return -1000;
     }
 
     // make the move that is beeing checked
@@ -137,9 +136,6 @@ class playerAI {
         }
       }
     }
-    // if (!isMaximizer) {
-    //   bestScore *= -1;
-    // }
     // catch all for development purpose
     board.undo(move.x, move.y, move.z);
     return bestScore;
