@@ -113,7 +113,8 @@ class Board {
     var vec = [];
 
     //check all lines
-    for (vec of this.neighborVectors) {
+    // for (vec of this.neighborVectors) {
+    for (vec of this.cells[x][y][z].neighbors) {
       count = 0;
       //check all points in line
       for (let vector of vec) {
