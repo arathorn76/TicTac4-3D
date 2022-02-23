@@ -13,53 +13,94 @@ class Cell {
     this.size2d = floor(min(width / factor, height / factor));
 
     this.neighbors = [];
+
+    this.valuePlayer1 = 0;
+    this.valuePlayer2 = 0;
   }
 
+  // evaluate the value of this cell for further use in minmax
+  eval() {
+    let valP1 = 0;
+    let valP2 = 0;
+
+    //evaluate every line of neghbors
+    let line = [];
+    for (line of this.neighbors) {
+      let lineSum = 0;
+      let p1 = false;
+      let p2 = false;
+      for (let c of line) {
+        if (c.state == 1) {
+          p1 = true;
+          lineSum++;
+        } else if (c.state == 2) {
+          p2 = true;
+          lineSum--;
+        }
+        if (p1 && p2) {
+          lineSum = 0;
+          break;
+        }
+      }
+      valP1 += lineSum;
+      valP2 -= lineSum;
+    }
+    //TODO benachbarte Zellen ebenfalls updaten
+  }
+
+  // receives an array of arrays of every possible neighbor,
+  // builds an array of arrays of actual neighbors
+  // each inner array represents a given line of neighbors that can be
+  // checked to determine completed lines
   setNeighbors(neighborVectors) {
     for (let h = 0; h < neighborVectors.length; h++) {
       let line = neighborVectors[h];
       this.neighbors[h] = [];
       for (let nei of line) {
         if (this.validCell(this.x + nei.x, this.y + nei.y, this.z + nei.z)) {
-          this.neighbors[h].push(nei);
+          this.neighbors[h].push(p5.Vector.add(nei, [this.x, this.y, this.z]));
         }
       }
     }
     //lines < 4 cells can be removed
-    for (let h = this.neighbors.length - 1; h >= 0 ; h--) {
-      if(this.neighbors[h].length < this.gridsize){
-        this.neighbors.splice(h,1);
+    for (let h = this.neighbors.length - 1; h >= 0; h--) {
+      if (this.neighbors[h].length < this.gridsize) {
+        this.neighbors.splice(h, 1);
       }
     }
   }
+
+  //Test to check if a given set of x,y,z-values adresses a valid cell
   validCell(x, y, z) {
-    var valid = true;
     if (x < 0 || x >= this.gridsize) {
-      valid = false;
+      return false;
     }
     if (y < 0 || y >= this.gridsize) {
-      valid = false;
+      return false;
     }
     if (z < 0 || z >= this.gridsize) {
-      valid = false;
+      return false;
     }
-    return valid;
+    return true;
   }
 
   play(player) {
     if (this.state === 0) {
       this.state = player;
+      board.evaluation.updateValues(this);
       return true;
     } else {
       console.log("invalid move");
       return false;
     }
   }
+
   undo() {
     if (this.state === 0) {
       return false;
     } else {
       this.state = 0;
+      board.evaluation.updateValues(this);
       return true;
     }
   }
@@ -117,6 +158,7 @@ class Cell {
     return false;
   }
 
+  // translate grid position to pixel position - one axis at a time
   pos2d(dimension) {
     let pos =
       (dimension + this.gridsize * (this.z - this.gridsize / 2)) * this.size2d;
@@ -156,6 +198,7 @@ class Cell {
     pop();
   }
 
+  // translate grid position to pixel position - one axis at a time
   pos3d(dimension) {
     let pos = (dimension - this.gridsize * 0.5) * this.size3d;
     return pos;
