@@ -1,4 +1,4 @@
-var board;
+let board;
 
 let baseTime;
 
@@ -33,7 +33,7 @@ function setup() {
 
   startGame();
 
-  frameRate(30);
+//  frameRate(30);
 }
 
 function draw() {
@@ -50,7 +50,7 @@ function draw() {
     if (board.movePossible()) {
       text("Player: " + board.activePlayer, 0, -height / 3);
       // show()
-      players[board.activePlayer - 1].makeMove();
+      (players[board.activePlayer - 1].makeMove());
     } else {
       text("TIE!", 0, -height / 3);
       // show()
@@ -58,7 +58,7 @@ function draw() {
       return;
     }
   }
-  console.log( `frame duration = ${ round( ( millis() - baseTime ) / 1000 , 3)} seconds` );
+  // console.log( `frame duration = ${ round( ( millis() - baseTime ) / 1000 , 3)} seconds` );
 }
 
 function mousePressed() {
@@ -123,12 +123,12 @@ function createGameControls() {
   player2.option(`HUMAN`);
   player2.option(`RANDOM`);
   player2.option(`AI1`);
-  player2.selected(`RANDOM`);
+  player2.selected(`HUMAN`);
 }
 
 function startGame() {
   createViewControls();
-  board = new Board(4, 40);
+  board = new Board(40);
   players[0] = new playerAI(player1.value(), 1);
   players[1] = new playerAI(player2.value(), 2);
   show();
