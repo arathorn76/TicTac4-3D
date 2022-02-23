@@ -1,5 +1,7 @@
+let size = 4;
+
 class Board {
-  constructor(size, cellsize) {
+  constructor(cellsize) {
     this.size = size;
     this.cellsize = cellsize;
     this.activePlayer = 1;
@@ -7,67 +9,52 @@ class Board {
     this.winner = false;
     this.possibleMoves = [];
 
-    this.neighborVectors = createNeighborVectors(4);
+    this.neighborVectors = createNeighborVectors(this.size);
     this.cells = [];
+    
+    this.evaluation = new Evaluation();
 
     for (var i = 0; i < this.size; i++) {
-      this.cells[i] = [];
-
       for (var j = 0; j < this.size; j++) {
-        this.cells[i][j] = [];
-
         for (var k = 0; k < this.size; k++) {
-          this.cells[i][j][k] = new Cell(i, j, k, this.cellsize, this.size);
-          this.cells[i][j][k].setNeighbors(this.neighborVectors);
+          this.cells[ix(i,j,k)] = new Cell(i, j, k, this.cellsize, this.size);
+          this.cells[ix(i,j,k)].setNeighbors(this.neighborVectors);
           this.possibleMoves.push(createVector(i, j, k));
+          this.evaluation.addLines(this.cells[ix(i,j,k)]);
         }
       }
     }
+    console.table(this.neighborVectors);
   }
 
   show2d() {
-    for (var i = 0; i < this.size; i++) {
-      for (var j = 0; j < this.size; j++) {
-        for (var k = 0; k < this.size; k++) {
-          this.cells[i][j][k].show2d();
-        }
-      }
+    for (var i = 0; i < this.cells.length; i++) {
+          this.cells[i].show2d();
     }
   }
 
   clicked2d(mx, my) {
-    for (var i = 0; i < this.size; i++) {
-      for (var j = 0; j < this.size; j++) {
-        for (var k = 0; k < this.size; k++) {
-          if (this.cells[i][j][k].clicked(mx, my)) {
-            return createVector(i, j, k);
-          }
-        }
+    for (var i = 0; i < this.cells.length; i++) {
+           if (this.cells[i].clicked(mx, my)) {
+            return createVector(this.cells[i].x, this.cells[i].y, this.cells[i].z);
       }
     }
     return false;
   }
 
   show3d() {
-    for (var i = 0; i < this.size; i++) {
-      for (var j = 0; j < this.size; j++) {
-        for (var k = 0; k < this.size; k++) {
-          this.cells[i][j][k].show3d();
-        }
-      }
+    for (var i = 0; i < this.cells.length; i++) {
+          this.cells[i].show2d();
     }
   }
 
   play(x, y, z, check4win = true) {
-    if (!this.validCell(x, y, z)) {
-      return false;
-    }
     let testVec = createVector(x, y, z);
     let index = this.possibleMoves.findIndex((element) =>
       element.equals(testVec)
     );
 
-    var validMove = this.cells[x][y][z].play(this.activePlayer);
+    var validMove = this.cells[ix(x,y,z)].play(this.activePlayer);
 
     if (validMove) {
       this.possibleMoves.splice(index, 1);
@@ -87,10 +74,7 @@ class Board {
   }
 
   undo(x, y, z) {
-    if (!this.validCell(x, y, z)) {
-      return false;
-    }
-    if (this.cells[x][y][z].undo(this.activePlayer)) {
+    if (this.cells[ix(x,y,z)].undo(this.activePlayer)) {
       this.otherPlayer = this.activePlayer;
       this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
       this.possibleMoves.push(createVector(x, y, z));
@@ -116,8 +100,7 @@ class Board {
     var vec = [];
 
     //check all lines
-    // for (vec of this.neighborVectors) {
-    for (vec of this.cells[x][y][z].neighbors) {
+    for (vec of this.cells[ix(x,y,z)].neighbors) {
       count = 0;
       //check all points in line
       for (let vector of vec) {
@@ -139,33 +122,14 @@ class Board {
     // -> do nothing
   }
 
-  validCell(x, y, z) {
-    var valid = true;
-    if (x < 0 || x >= this.size) {
-      valid = false;
-    }
-    if (y < 0 || y >= this.size) {
-      valid = false;
-    }
-    if (z < 0 || z >= this.size) {
-      valid = false;
-    }
-    return valid;
-  }
 
   checkNeighbor(x, y, z, vec, player = this.activPlayer) {
     //returns 0 if cell or neighbor cell is invalid or cell is empty
     //returns 1 if checked cell is owned by activePlayer
     //returns negative if cell is owned by opponent
     //(negative enough to pull any line with opposing forces negative)
-    if (!this.validCell(x + vec.x, y + vec.y, z + vec.z)) {
-      return 0;
-    }
-    // if (!this.validCell(x, y, z)) {
-    //   return 0;
-    // }
 
-    switch (this.cells[x + vec.x][y + vec.y][z + vec.z].state) {
+    switch (this.cells[ix(vec.x,vec.y,vec.z)].state) {
       case player:
         return 1;
       case 0:
@@ -177,9 +141,9 @@ class Board {
 
   paintWinner(x, y, z, vectorarray) {
     for (let vec of vectorarray) {
-      vec.add(x, y, z);
+      // vec.add(x, y, z);
       console.log(vec, x, y, z);
-        this.cells[vec.x][vec.y][vec.z].state += 2;
+        this.cells[ix(vec.x,vec.y,vec.z)].state += 2;
     }
   }
 } //end of class board
@@ -218,4 +182,8 @@ function createNeighborVectors(size) {
     }
   }
   return vectorField;
+}
+
+function ix(x,y,z){
+  return x + y * size + z * size * size;
 }
