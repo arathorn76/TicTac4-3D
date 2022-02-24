@@ -7,13 +7,6 @@ class playerAI {
      */
     this.type = type_;
     this.id = id_;
-    this.evals = {
-      row4: 1000,
-      row2: 3,
-      row3: 10,
-      multirow3: 10,
-      noGood: 0,
-    };
   }
 
   makeMove() {
@@ -86,7 +79,7 @@ class playerAI {
     }
     if (actualDepth < 0) {
       // evaluate the board, return actual evaluation value
-      return this.minimaxEvaluateBoardState(playerEval);
+      return board.evaluation.getBoardValue(playerEval);
     }
     // make the move that is beeing checked
     // at every subsequent return the move MUST be undone
@@ -94,13 +87,11 @@ class playerAI {
 
     // check if this move is winning, return if so
     if (board.checkWinningMove(move.x, move.y, move.z, false)) {
+      console.log(`winning, maximizer = ${isMaximizer}`)
       board.undo(move.x, move.y, move.z);
-      let winValue = this.evals.row4;
+      let winValue = board.evaluation.evals.row4;
       if (!isMaximizer) {
         winValue *= -1;
-      }
-      if (debug) {
-        console.log(`WinValue`, winValue);
       }
       return winValue;
     }
@@ -115,7 +106,6 @@ class playerAI {
         let score = -Infinity;
 
         score = this.minimax(
-          // board,
           move,
           actualDepth,
           !isMaximizer,
@@ -154,73 +144,4 @@ class playerAI {
     return bestScore;
   }
 
-  minimaxEvaluateBoardState(playerEval) {
-    //Evaluation prinziple:
-    //starting points are only available cells
-    //(value lies in the fact that this line can be completed)
-    let boardValue = 0;
-    for (let cell of board.possibleMoves) {
-      let cellValue = 0;
-      //check all lines with this cell
-      let neighborVectors = board.cells[ix(cell.x,cell.y,cell.z)].neighbors;
-      for (let vector of neighborVectors) {
-        let lineValue = 0;
-        let lineFlags = 0;
-if(debug && cell.x === 3 && cell.y === 3 && cell.z === 1){
-  }
-        for (let neighbor of vector) {
-          let receive = board.checkNeighbor(
-            cell.x,
-            cell.y,
-            cell.z,
-            neighbor,
-            playerEval
-          );
-          lineFlags += receive;
-        } //end neighbor of line
-        // lineValue = lineFlags;
-        switch (lineFlags) {
-          // case 1:
-          //   break;
-          // case 2:
-          //   lineValue += this.evals.row2;
-          //   break;
-          case 3:
-            lineValue += this.evals.row3;
-            break;
-          case 4:
-            lineValue += this.evals.row4;
-          // case -2:
-          //   lineValue += this.evals.noGood;
-          //   break;
-          // case -3:
-          //   lineValue += this.evals.noGood;
-          //   break;
-          // case -4:
-          //   lineValue += this.evals.noGood;
-          //   break;
-          // case -7:
-          //   lineValue += this.evals.noGood;
-          //   break;
-          // case -8:
-          //   lineValue -= this.evals.row2;
-          //   break;
-          case -12:
-            lineValue -= this.evals.row3 * 2;
-            break;
-          case -16:
-            lineValue -= this.evals.row4;
-          default:
-        } //end switch
-        cellValue += lineValue;
-      } //vector of neighborVectors
-
-      //acumulate cellValues to build boardValue;
-      boardValue += cellValue;
-    }
-    if(debug){
-      console.log(`Evaluation for ${playerEval} result ${boardValue}`);
-    }
-    return boardValue;
-  }
 }
