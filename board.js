@@ -11,32 +11,31 @@ class Board {
 
     this.neighborVectors = createNeighborVectors(this.size);
     this.cells = [];
-    
+
     this.evaluation = new Evaluation();
 
     for (var i = 0; i < this.size; i++) {
       for (var j = 0; j < this.size; j++) {
         for (var k = 0; k < this.size; k++) {
-          this.cells[ix(i,j,k)] = new Cell(i, j, k, this.cellsize, this.size);
-          this.cells[ix(i,j,k)].setNeighbors(this.neighborVectors);
+          this.cells[ix(i, j, k)] = new Cell(i, j, k, this.cellsize, this.size);
+          this.cells[ix(i, j, k)].setNeighbors(this.neighborVectors);
           this.possibleMoves.push(createVector(i, j, k));
-          this.evaluation.addLines(this.cells[ix(i,j,k)]);
+          this.evaluation.addLines(this.cells[ix(i, j, k)]);
         }
       }
     }
-    console.table(this.neighborVectors);
   }
 
   show2d() {
     for (var i = 0; i < this.cells.length; i++) {
-          this.cells[i].show2d();
+      this.cells[i].show2d();
     }
   }
 
   clicked2d(mx, my) {
     for (var i = 0; i < this.cells.length; i++) {
-           if (this.cells[i].clicked(mx, my)) {
-            return createVector(this.cells[i].x, this.cells[i].y, this.cells[i].z);
+      if (this.cells[i].clicked(mx, my)) {
+        return createVector(this.cells[i].x, this.cells[i].y, this.cells[i].z);
       }
     }
     return false;
@@ -44,7 +43,7 @@ class Board {
 
   show3d() {
     for (var i = 0; i < this.cells.length; i++) {
-          this.cells[i].show2d();
+      this.cells[i].show3d();
     }
   }
 
@@ -54,7 +53,7 @@ class Board {
       element.equals(testVec)
     );
 
-    var validMove = this.cells[ix(x,y,z)].play(this.activePlayer);
+    var validMove = this.cells[ix(x, y, z)].play(this.activePlayer);
 
     if (validMove) {
       this.possibleMoves.splice(index, 1);
@@ -74,7 +73,7 @@ class Board {
   }
 
   undo(x, y, z) {
-    if (this.cells[ix(x,y,z)].undo(this.activePlayer)) {
+    if (this.cells[ix(x, y, z)].undo(this.activePlayer)) {
       this.otherPlayer = this.activePlayer;
       this.activePlayer = map(this.activePlayer, 1, 2, 2, 1);
       this.possibleMoves.push(createVector(x, y, z));
@@ -100,28 +99,18 @@ class Board {
     var vec = [];
 
     //check all lines
-    for (vec of this.cells[ix(x,y,z)].neighbors) {
-      count = 0;
-      //check all points in line
-      for (let vector of vec) {
-        receive = this.checkNeighbor(x, y, z, vector, this.activePlayer);
-        if (receive > 0) {
-          count += receive;
-        }
+    let values = this.evaluation.getCellValues(this.cells[ix(x, y, z)]);
+    if (
+      values.player1 >= this.evaluation.evals.row4 ||
+      values.player2 >= this.evaluation.evals.row4
+    ) {
+      if (paint) {
+        let vec = this.evaluation.lines[values.idx];
+        this.paintWinner(x, y, z, vec);
       }
-
-      // if the count reaches this.size the move was winning
-      if (count === this.size) {
-        if (paint) {
-          this.paintWinner(x, y, z, vec);
-        }
-        return true;
-      }
+      return true;
     }
-    // if the count does not reach 4 the move was not winning
-    // -> do nothing
   }
-
 
   checkNeighbor(x, y, z, vec, player = this.activPlayer) {
     //returns 0 if cell or neighbor cell is invalid or cell is empty
@@ -129,7 +118,7 @@ class Board {
     //returns negative if cell is owned by opponent
     //(negative enough to pull any line with opposing forces negative)
 
-    switch (this.cells[ix(vec.x,vec.y,vec.z)].state) {
+    switch (this.cells[ix(vec.x, vec.y, vec.z)].state) {
       case player:
         return 1;
       case 0:
@@ -142,15 +131,14 @@ class Board {
   paintWinner(x, y, z, vectorarray) {
     for (let vec of vectorarray) {
       // vec.add(x, y, z);
-      console.log(vec, x, y, z);
-        this.cells[ix(vec.x,vec.y,vec.z)].state += 2;
+      // console.log(vec, x, y, z);
+      this.cells[ix(vec.x, vec.y, vec.z)].state += 2;
     }
   }
 } //end of class board
 
-
 function createNeighborVectors(size) {
-      //create an array of 13*7 vectors
+  //create an array of 13*7 vectors
   let directions = [
     [1, 0, 0],
     [0, 1, 0],
@@ -184,6 +172,6 @@ function createNeighborVectors(size) {
   return vectorField;
 }
 
-function ix(x,y,z){
+function ix(x, y, z) {
   return x + y * size + z * size * size;
 }
