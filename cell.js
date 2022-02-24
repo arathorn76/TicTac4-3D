@@ -14,39 +14,8 @@ class Cell {
 
     this.neighbors = [];
 
-    this.valuePlayer1 = 0;
-    this.valuePlayer2 = 0;
   }
 
-  // evaluate the value of this cell for further use in minmax
-  eval() {
-    let valP1 = 0;
-    let valP2 = 0;
-
-    //evaluate every line of neghbors
-    let line = [];
-    for (line of this.neighbors) {
-      let lineSum = 0;
-      let p1 = false;
-      let p2 = false;
-      for (let c of line) {
-        if (c.state == 1) {
-          p1 = true;
-          lineSum++;
-        } else if (c.state == 2) {
-          p2 = true;
-          lineSum--;
-        }
-        if (p1 && p2) {
-          lineSum = 0;
-          break;
-        }
-      }
-      valP1 += lineSum;
-      valP2 -= lineSum;
-    }
-    //TODO benachbarte Zellen ebenfalls updaten
-  }
 
   // receives an array of arrays of every possible neighbor,
   // builds an array of arrays of actual neighbors
@@ -54,9 +23,9 @@ class Cell {
   // checked to determine completed lines
   setNeighbors(neighborVectors) {
     for (let h = 0; h < neighborVectors.length; h++) {
-      let line = neighborVectors[h];
+      let newLine = neighborVectors[h];
       this.neighbors[h] = [];
-      for (let nei of line) {
+      for (let nei of newLine) {
         if (this.validCell(this.x + nei.x, this.y + nei.y, this.z + nei.z)) {
           this.neighbors[h].push(p5.Vector.add(nei, [this.x, this.y, this.z]));
         }
@@ -116,7 +85,8 @@ class Cell {
         // player 1
         noFill();
         rectMode(CENTER);
-        rect(x + offset, y + offset, offset);
+        this.cross(x,y,offset);
+        // rect(x + offset, y + offset, offset);
         fill(255, 100, 100, 100);
         break;
 
@@ -146,6 +116,11 @@ class Cell {
     rect(x, y, offset * 2);
   }
 
+  cross(x,y,offset){
+    line(x+offset*0.5, y+offset*0.5, x+offset*1.5 ,y+offset*1.5);
+    line(x+offset*0.5, y+offset*1.5, x+offset*1.5, y+offset*0.5);
+
+  }
   clicked(mx, my) {
     let x = this.pos2d(this.x);
     let y = this.pos2d(this.y);
