@@ -37,7 +37,7 @@ function setup() {
 }
 
 function draw() {
-  baseTime = millis();
+  // baseTime = millis();
   show();
 
   fill(255, 0, 0);
@@ -49,7 +49,7 @@ function draw() {
   } else {
     if (board.movePossible()) {
       text("Player: " + board.activePlayer, 0, -height / 3);
-      // show()
+      text(`Values: ${board.evaluation.getBoardValuesString()}`, -width/2 + 10, height  / 3);
       (players[board.activePlayer - 1].makeMove());
     } else {
       text("TIE!", 0, -height / 3);
